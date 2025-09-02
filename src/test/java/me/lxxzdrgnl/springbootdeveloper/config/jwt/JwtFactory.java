@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyMap;
 
+@Builder
 @Getter
 public class JwtFactory {
 

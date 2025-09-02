@@ -33,6 +33,9 @@ dependencies {
     implementation 'com.mysql:mysql-connector-j'
 }
 
+jar {
+    enable = false
+}
 
 test {
     useJUnitPlatform()

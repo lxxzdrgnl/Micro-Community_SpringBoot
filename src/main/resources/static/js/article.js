@@ -26,9 +26,15 @@ if (modifyButton) {
         let params = new URLSearchParams(location.search);
         let id = params.get('id');
 
+        // 사용자 입력값 가져오기
+        const content = document.getElementById('content').value;
+
+        // 줄바꿈(\n)을 <br> 태그로 변환하여 저장
+        const formattedContent = content.replace(/\n/g, '<br>');
+
         body = JSON.stringify({
             title: document.getElementById('title').value,
-            content: document.getElementById('content').value
+            content: formattedContent
         })
 
         function success() {
@@ -49,12 +55,18 @@ if (modifyButton) {
 const createButton = document.getElementById('create-btn');
 
 if (createButton) {
-    // 등록 버튼을 클릭하면 /api/articles로 요청을 보낸다
     createButton.addEventListener('click', event => {
+        // 사용자 입력값 가져오기
+        const content = document.getElementById('content').value;
+
+        // 줄바꿈(\n)을 <br> 태그로 변환하여 저장
+        const formattedContent = content.replace(/\n/g, '<br>');
+
         body = JSON.stringify({
             title: document.getElementById('title').value,
-            content: document.getElementById('content').value
+            content: formattedContent
         });
+
         function success() {
             alert('등록 완료되었습니다.');
             location.replace('/articles');
@@ -89,7 +101,6 @@ if (logoutButton) {
         httpRequest('DELETE','/api/refresh-token', null, success, fail);
     });
 }
-
 
 
 // 쿠키를 가져오는 함수
@@ -161,7 +172,15 @@ window.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');
     const loginButton = document.getElementById('login-btn');
     const logoutButton = document.getElementById('logout-btn');
+    // 수정 페이지에서 내용 불러올 때 줄바꿈(<br>)을 \n으로 변환
+    const contentInput = document.getElementById('content');
 
+    // 수정창(textarea)이 있고, 그 안에 <br> 태그가 포함되어 있다면
+    if (contentInput && contentInput.value.includes('<br>')) {
+        let rawContent = contentInput.value;
+        let formattedContentForEdit = rawContent.replace(/<br\s*\/?>/ig, '\n');
+        contentInput.value = formattedContentForEdit;
+    }
     // 로그인/로그아웃 버튼 제어
     if (token) {
         loginButton.style.display = 'none';
@@ -197,6 +216,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
     // 수정/삭제 버튼 제어
     const modifyButton = document.getElementById('modify-btn');
+    const deleteButton = document.getElementById('delete-btn');
     if (modifyButton) { // 글 상세 페이지인지 확인
         if (token) {
             // 1. 토큰을 해석해 로그인한 사용자 정보(이메일 등)를 얻습니다.
@@ -208,7 +228,7 @@ window.addEventListener('DOMContentLoaded', function () {
             // 3. 두 정보가 일치하는 경우에만 버튼을 보여줍니다.
             if (loggedInUser === articleAuthor) {
                 modifyButton.style.display = 'inline-block';
-                document.getElementById('delete-btn').style.display = 'inline-block';
+                deleteButton.style.display = 'inline-block';
             }
         }
     }

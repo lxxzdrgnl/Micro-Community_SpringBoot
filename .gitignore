@@ -44,3 +44,5 @@ bin/
 # Application configuration
 application.yml
 application.properties
+
+.idea

@@ -85,21 +85,21 @@ const commentCreateButton = document.getElementById('comment-create-btn');
 
 if (commentCreateButton) {
     commentCreateButton.addEventListener('click', event => {
-        articleID = document.getElementById('article-id').value;
+        articleId = document.getElementById('article-id').value;
 
         const body = JSON.stringify({
-            articleID: articleID,
+            articleId: articleId,
             content: document.getElementById('content').value
         });
 
         function success() {
             alert('등록 완료되었습니다.');
-            location.replace('/articles/' + articleID);
+            location.replace('/articles/' + articleId);
         }
 
         function fail() {
             alert('등록 실패했습니다.');
-            location.replace('/articles/' + articleID);
+            location.replace('/articles/' + articleId);
         }
 
         httpRequest('POST', '/api/comments', body, success, fail);
@@ -199,30 +199,17 @@ window.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');
     const loginButton = document.getElementById('login-btn');
     const logoutButton = document.getElementById('logout-btn');
-    // 수정 페이지에서 내용 불러올 때 줄바꿈(<br>)을 \n으로 변환
+    const createButton = document.getElementById('create-btn');
+    const modifyButton = document.getElementById('modify-btn');
+    const deleteButton = document.getElementById('delete-btn');
     const contentInput = document.getElementById('content');
-
-    // 수정창(textarea)이 있고, 그 안에 <br> 태그가 포함되어 있다면
-    if (contentInput && contentInput.value.includes('<br>')) {
-        let rawContent = contentInput.value;
-        let formattedContentForEdit = rawContent.replace(/<br\s*\/?>/ig, '\n');
-        contentInput.value = formattedContentForEdit;
-    }
-    // 로그인/로그아웃 버튼 제어
-    if (token) {
-        loginButton.style.display = 'none';
-        logoutButton.style.display = 'inline-block';
-    } else {
-        loginButton.style.display = 'inline-block';
-        logoutButton.style.display = 'none';
-    }
 
     // JWT 토큰의 Payload(사용자 정보)를 디코딩하는 함수
     function parseJwt(token) {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
             }).join(''));
             return JSON.parse(jsonPayload);
@@ -231,32 +218,37 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // 글 등록 버튼 제어
-    const createButton = document.getElementById('create-btn');
-    if (createButton) { // 글 등록 버튼이 존재하는지(즉, 글 목록 페이지인지) 확인
+    // 로그인/로그아웃 버튼 제어
+    if (loginButton && logoutButton) {
         if (token) {
-            createButton.style.display = 'inline-block'; // 토큰 있으면 보여주기
+            loginButton.style.display = 'none';
+            logoutButton.style.display = 'inline-block';
         } else {
-            createButton.style.display = 'none'; // 토큰 없으면 숨기기
+            loginButton.style.display = 'inline-block';
+            logoutButton.style.display = 'none';
         }
     }
 
+    // 글 등록 버튼 제어
+    if (createButton) {
+        createButton.style.display = token ? 'inline-block' : 'none';
+    }
+
+    // 수정 페이지에서 내용 불러올 때 줄바꿈(<br>)을 \n으로 변환
+    if (contentInput && contentInput.value.includes('<br>')) {
+        let rawContent = contentInput.value;
+        let formattedContentForEdit = rawContent.replace(/<br\s*\/?>/ig, '\n');
+        contentInput.value = formattedContentForEdit;
+    }
+
     // 수정/삭제 버튼 제어
-    const modifyButton = document.getElementById('modify-btn');
-    const deleteButton = document.getElementById('delete-btn');
-    if (modifyButton) { // 글 상세 페이지인지 확인
-        if (token) {
-            // 1. 토큰을 해석해 로그인한 사용자 정보(이메일 등)를 얻습니다.
-            const loggedInUser = parseJwt(token).sub;
+    if (modifyButton && deleteButton && token) {
+        const loggedInUser = parseJwt(token).sub;
+        const articleAuthor = document.getElementById('article-author').value;
 
-            // 2. HTML에 숨겨둔 input에서 글 작성자 정보를 얻습니다.
-            const articleAuthor = document.getElementById('article-author').value;
-
-            // 3. 두 정보가 일치하는 경우에만 버튼을 보여줍니다.
-            if (loggedInUser === articleAuthor) {
-                modifyButton.style.display = 'inline-block';
-                deleteButton.style.display = 'inline-block';
-            }
+        if (loggedInUser === articleAuthor) {
+            modifyButton.style.display = 'inline-block';
+            deleteButton.style.display = 'inline-block';
         }
     }
 });

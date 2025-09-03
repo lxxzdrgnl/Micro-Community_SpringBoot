@@ -80,6 +80,31 @@ if (createButton) {
     });
 }
 
+// 댓글 생성 기능
+const commentCreateButton = document.getElementById('comment-create-btn');
+
+if (commentCreateButton) {
+    commentCreateButton.addEventListener('click', event => {
+        articleID = document.getElementById('article-id').value;
+
+        const body = JSON.stringify({
+            articleID: articleID,
+            content: document.getElementById('content').value
+        });
+
+        function success() {
+            alert('등록 완료되었습니다.');
+            location.replace('/articles/' + articleID);
+        }
+
+        function fail() {
+            alert('등록 실패했습니다.');
+            location.replace('/articles/' + articleID);
+        }
+
+        httpRequest('POST', '/api/comments', body, success, fail);
+    });
+}
 
 // 로그아웃 기능
 const logoutButton = document.getElementById('logout-btn');
@@ -167,6 +192,8 @@ function httpRequest(method, url, body, success, fail) {
         }
     });
 }
+
+
 
 window.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');

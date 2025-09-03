@@ -2,10 +2,13 @@ package me.lxxzdrgnl.springbootdeveloper.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import me.lxxzdrgnl.springbootdeveloper.domain.Comment;
 import me.lxxzdrgnl.springbootdeveloper.dto.AddArticleRequest;
 import me.lxxzdrgnl.springbootdeveloper.domain.Article;
+import me.lxxzdrgnl.springbootdeveloper.dto.AddCommentRequest;
 import me.lxxzdrgnl.springbootdeveloper.dto.UpdateArticleRequest;
 import me.lxxzdrgnl.springbootdeveloper.repository.BlogRepository;
+import me.lxxzdrgnl.springbootdeveloper.repository.CommentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final CommentRepository commentRepository;
 
     public Article save(AddArticleRequest request, String userName) {
         return blogRepository.save(request.toEntity(userName));
@@ -55,5 +59,11 @@ public class BlogService {
         if (!article.getAuthor().equals(userName)) {
             throw new IllegalArgumentException("not authorized");
         }
+    }
+
+    public Comment addComment(AddCommentRequest request, String userName) {
+        Article article = blogRepository.findById(request.getArticleId())
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + request.getArticleId()));
+        return commentRepository.save(request.toEntity(userName, article));
     }
 }

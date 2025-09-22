@@ -1,4 +1,4 @@
-# Spring Boot Blog Project
+# Spring Boot Micro-Community Project
 
 This project is a **small community application** developed based on the book  
 **"스프링부트3 백엔드 개발자 되기 (Becoming a Spring Boot 3 Back-End Developer)"**.  
